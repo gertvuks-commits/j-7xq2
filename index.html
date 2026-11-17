@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#02050a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JARVIS">
+  <title>J.A.R.V.I.S</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="icon" href="./apple-touch-icon.png">
+</head>
+<body>
+  <div class="fx-grid" aria-hidden="true"></div>
+  <div class="fx-hex" aria-hidden="true"></div>
+  <div class="fx-vignette" aria-hidden="true"></div>
+  <div class="fx-scan" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <h1>J.A.R.V.I.S</h1>
+        <p class="brand-sub">Just A Rather Very Intelligent System</p>
+      </div>
+    </div>
+    <div class="sys-pill" id="sysPill">
+      <span class="sys-dot"></span>
+      <span id="sysLabel">INITIALIZING</span>
+    </div>
+    <div class="clock-block" aria-live="polite">
+      <div class="clock-time" id="clockTime">00:00:00</div>
+      <div class="clock-date" id="clockDate">—</div>
+    </div>
+    <div class="top-actions">
+    <button type="button" class="icon-btn mobile-only" id="btnToggleLog" data-i18n="logBtn" data-i18n-aria="openLog" data-i18n-title="openLog" aria-label="Open comm log" title="Comm log">Log</button>
+    <button type="button" class="icon-btn mobile-only" id="btnToggleSys" data-i18n="sysBtn" data-i18n-aria="openSys" data-i18n-title="openSys" aria-label="Open systems" title="Systems">Sys</button>
+    <button type="button" class="icon-btn" id="btnSettings" data-i18n-aria="settings" data-i18n-title="settings" aria-label="Open settings" title="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.5.42l-.36 2.54c-.59.22-1.14.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.8 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.92 14.16a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.43.34.69.22l2.39-.96c.49.4 1.04.72 1.63.94l.36 2.54c.05.24.26.42.5.42h3.8c.24 0 .45-.18.5-.42l.36-2.54c.59-.22 1.14-.54 1.63-.94l2.39.96c.26.12.55.02.69-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/>
+      </svg>
+    </button>
+    </div>
+  </header>
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+
+  <main class="stage">
+    <aside class="panel log-panel" id="logPanel">
+      <div class="panel-chrome">
+        <span class="panel-title" data-i18n="commLog">Comm log</span>
+        <span class="panel-tag" id="logCount">00</span>
+        <button type="button" class="icon-btn mobile-only drawer-close" id="btnCloseLog" data-i18n-aria="closeLog" aria-label="Close comm log">×</button>
+      </div>
+      <div class="log" id="log" role="log" aria-live="polite"></div>
+    </aside>
+
+    <section class="core">
+      <div class="reactor" id="reactor" data-state="idle" aria-hidden="true">
+        <div class="reactor-aura"></div>
+        <div class="reactor-halo"></div>
+        <svg class="reactor-svg" viewBox="0 0 500 500" role="img" aria-label="Arc reactor">
+          <defs>
+            <radialGradient id="coreGrad" cx="50%" cy="42%" r="58%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="35%" stop-color="#e7ffff"/>
+              <stop offset="70%" stop-color="#4ad6ff"/>
+              <stop offset="100%" stop-color="#006a9a"/>
+            </radialGradient>
+            <radialGradient id="discGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(20,70,90,0.15)"/>
+              <stop offset="70%" stop-color="rgba(0,40,60,0.05)"/>
+              <stop offset="100%" stop-color="rgba(0,200,255,0.18)"/>
+            </radialGradient>
+            <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3.5" result="b"/>
+              <feMerge>
+                <feMergeNode in="b"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="hotGlow" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur stdDeviation="8" result="b"/>
+              <feMerge>
+                <feMergeNode in="b"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <path id="legendPath" d="M250,250 m0,-232 a232,232 0 1,1 0,464 a232,232 0 1,1 0,-464"/>
+          </defs>
+
+          <circle class="disc" cx="250" cy="250" r="236" fill="url(#discGrad)"/>
+
+          <text class="legend-text">
+            <textPath href="#legendPath" startOffset="0%">
+              J.A.R.V.I.S  ·  JUST A RATHER VERY INTELLIGENT SYSTEM  ·  STARK PROTOCOL  ·  J.A.R.V.I.S  ·  JUST A RATHER VERY INTELLIGENT SYSTEM  ·  STARK PROTOCOL  ·
+            </textPath>
+          </text>
+
+          <g class="ring-outer-ticks" filter="url(#softGlow)">
+            <line class="tick-major" x1="250.00" y1="36.00" x2="250.00" y2="17.00"/>
+            <line class="" x1="268.65" y1="36.81" x2="269.87" y2="22.87"/>
+            <line class="" x1="287.16" y1="39.25" x2="289.59" y2="25.46"/>
+            <line class="" x1="305.39" y1="43.29" x2="309.01" y2="29.77"/>
+            <line class="" x1="323.19" y1="48.91" x2="327.98" y2="35.75"/>
+            <line class="" x1="340.44" y1="56.05" x2="346.36" y2="43.36"/>
+            <line class="tick-major" x1="357.00" y1="64.67" x2="366.50" y2="48.22"/>
+            <line class="" x1="372.75" y1="74.70" x2="380.78" y2="63.23"/>
+            <line class="" x1="387.56" y1="86.07" x2="396.56" y2="75.34"/>
+            <line class="" x1="401.32" y1="98.68" x2="411.22" y2="88.78"/>
+            <line class="" x1="413.93" y1="112.44" x2="424.66" y2="103.44"/>
+            <line class="" x1="425.30" y1="127.25" x2="436.77" y2="119.22"/>
+            <line class="tick-major" x1="435.33" y1="143.00" x2="451.78" y2="133.50"/>
+            <line class="" x1="443.95" y1="159.56" x2="456.64" y2="153.64"/>
+            <line class="" x1="451.09" y1="176.81" x2="464.25" y2="172.02"/>
+            <line class="" x1="456.71" y1="194.61" x2="470.23" y2="190.99"/>
+            <line class="" x1="460.75" y1="212.84" x2="474.54" y2="210.41"/>
+            <line class="" x1="463.19" y1="231.35" x2="477.13" y2="230.13"/>
+            <line class="tick-major" x1="464.00" y1="250.00" x2="483.00" y2="250.00"/>
+            <line class="" x1="463.19" y1="268.65" x2="477.13" y2="269.87"/>
+            <line class="" x1="460.75" y1="287.16" x2="474.54" y2="289.59"/>
+            <line class="" x1="456.71" y1="305.39" x2="470.23" y2="309.01"/>
+            <line class="" x1="451.09" y1="323.19" x2="464.25" y2="327.98"/>
+            <line class="" x1="443.95" y1="340.44" x2="456.64" y2="346.36"/>
+            <line class="tick-major" x1="435.33" y1="357.00" x2="451.78" y2="366.50"/>
+            <line class="" x1="425.30" y1="372.75" x2="436.77" y2="380.78"/>
+            <line class="" x1="413.93" y1="387.56" x2="424.66" y2="396.56"/>
+            <line class="" x1="401.32" y1="401.32" x2="411.22" y2="411.22"/>
+            <line class="" x1="387.56" y1="413.93" x2="396.56" y2="424.66"/>
+            <line class="" x1="372.75" y1="425.30" x2="380.78" y2="436.77"/>
+            <line class="tick-major" x1="357.00" y1="435.33" x2="366.50" y2="451.78"/>
+            <line class="" x1="340.44" y1="443.95" x2="346.36" y2="456.64"/>
+            <line class="" x1="323.19" y1="451.09" x2="327.98" y2="464.25"/>
+            <line class="" x1="305.39" y1="456.71" x2="309.01" y2="470.23"/>
+            <line class="" x1="287.16" y1="460.75" x2="289.59" y2="474.54"/>
+            <line class="" x1="268.65" y1="463.19" x2="269.87" y2="477.13"/>
+            <line class="tick-major" x1="250.00" y1="464.00" x2="250.00" y2="483.00"/>
+            <line class="" x1="231.35" y1="463.19" x2="230.13" y2="477.13"/>
+            <line class="" x1="212.84" y1="460.75" x2="210.41" y2="474.54"/>
+            <line class="" x1="194.61" y1="456.71" x2="190.99" y2="470.23"/>
+            <line class="" x1="176.81" y1="451.09" x2="172.02" y2="464.25"/>
+            <line class="" x1="159.56" y1="443.95" x2="153.64" y2="456.64"/>
+            <line class="tick-major" x1="143.00" y1="435.33" x2="133.50" y2="451.78"/>
+            <line class="" x1="127.25" y1="425.30" x2="119.22" y2="436.77"/>
+            <line class="" x1="112.44" y1="413.93" x2="103.44" y2="424.66"/>
+            <line class="" x1="98.68" y1="401.32" x2="88.78" y2="411.22"/>
+            <line class="" x1="86.07" y1="387.56" x2="75.34" y2="396.56"/>
+            <line class="" x1="74.70" y1="372.75" x2="63.23" y2="380.78"/>
+            <line class="tick-major" x1="64.67" y1="357.00" x2="48.22" y2="366.50"/>
+            <line class="" x1="56.05" y1="340.44" x2="43.36" y2="346.36"/>
+            <line class="" x1="48.91" y1="323.19" x2="35.75" y2="327.98"/>
+            <line class="" x1="43.29" y1="305.39" x2="29.77" y2="309.01"/>
+            <line class="" x1="39.25" y1="287.16" x2="25.46" y2="289.59"/>
+            <line class="" x1="36.81" y1="268.65" x2="22.87" y2="269.87"/>
+            <line class="tick-major" x1="36.00" y1="250.00" x2="17.00" y2="250.00"/>
+            <line class="" x1="36.81" y1="231.35" x2="22.87" y2="230.13"/>
+            <line class="" x1="39.25" y1="212.84" x2="25.46" y2="210.41"/>
+            <line class="" x1="43.29" y1="194.61" x2="29.77" y2="190.99"/>
+            <line class="" x1="48.91" y1="176.81" x2="35.75" y2="172.02"/>
+            <line class="" x1="56.05" y1="159.56" x2="43.36" y2="153.64"/>
+            <line class="tick-major" x1="64.67" y1="143.00" x2="48.22" y2="133.50"/>
+            <line class="" x1="74.70" y1="127.25" x2="63.23" y2="119.22"/>
+            <line class="" x1="86.07" y1="112.44" x2="75.34" y2="103.44"/>
+            <line class="" x1="98.68" y1="98.68" x2="88.78" y2="88.78"/>
+            <line class="" x1="112.44" y1="86.07" x2="103.44" y2="75.34"/>
+            <line class="" x1="127.25" y1="74.70" x2="119.22" y2="63.23"/>
+            <line class="tick-major" x1="143.00" y1="64.67" x2="133.50" y2="48.22"/>
+            <line class="" x1="159.56" y1="56.05" x2="153.64" y2="43.36"/>
+            <line class="" x1="176.81" y1="48.91" x2="172.02" y2="35.75"/>
+            <line class="" x1="194.61" y1="43.29" x2="190.99" y2="29.77"/>
+            <line class="" x1="212.84" y1="39.25" x2="210.41" y2="25.46"/>
+            <line class="" x1="231.35" y1="36.81" x2="230.13" y2="22.87"/>
+          </g>
+
+          <g class="spin spin-slow">
+            <animateTransform attributeName="transform" type="rotate" from="0 250 250" to="360 250 250" dur="48s" repeatCount="indefinite"/>
+            <circle class="ring-dashed" cx="250" cy="250" r="204" fill="none"/>
+          </g>
+
+          <g class="ring-inner-ticks">
+            <line class="tick-major" x1="250.00" y1="74.00" x2="250.00" y2="61.00"/>
+            <line class="" x1="280.56" y1="76.67" x2="282.30" y2="66.83"/>
+            <line class="" x1="310.20" y1="84.61" x2="313.62" y2="75.22"/>
+            <line class="" x1="338.00" y1="97.58" x2="343.00" y2="88.92"/>
+            <line class="" x1="363.13" y1="115.18" x2="369.56" y2="107.52"/>
+            <line class="" x1="384.82" y1="136.87" x2="392.48" y2="130.44"/>
+            <line class="tick-major" x1="402.42" y1="162.00" x2="413.68" y2="155.50"/>
+            <line class="" x1="415.39" y1="189.80" x2="424.78" y2="186.38"/>
+            <line class="" x1="423.33" y1="219.44" x2="433.17" y2="217.70"/>
+            <line class="" x1="426.00" y1="250.00" x2="436.00" y2="250.00"/>
+            <line class="" x1="423.33" y1="280.56" x2="433.17" y2="282.30"/>
+            <line class="" x1="415.39" y1="310.20" x2="424.78" y2="313.62"/>
+            <line class="tick-major" x1="402.42" y1="338.00" x2="413.68" y2="344.50"/>
+            <line class="" x1="384.82" y1="363.13" x2="392.48" y2="369.56"/>
+            <line class="" x1="363.13" y1="384.82" x2="369.56" y2="392.48"/>
+            <line class="" x1="338.00" y1="402.42" x2="343.00" y2="411.08"/>
+            <line class="" x1="310.20" y1="415.39" x2="313.62" y2="424.78"/>
+            <line class="" x1="280.56" y1="423.33" x2="282.30" y2="433.17"/>
+            <line class="tick-major" x1="250.00" y1="426.00" x2="250.00" y2="439.00"/>
+            <line class="" x1="219.44" y1="423.33" x2="217.70" y2="433.17"/>
+            <line class="" x1="189.80" y1="415.39" x2="186.38" y2="424.78"/>
+            <line class="" x1="162.00" y1="402.42" x2="157.00" y2="411.08"/>
+            <line class="" x1="136.87" y1="384.82" x2="130.44" y2="392.48"/>
+            <line class="" x1="115.18" y1="363.13" x2="107.52" y2="369.56"/>
+            <line class="tick-major" x1="97.58" y1="338.00" x2="86.32" y2="344.50"/>
+            <line class="" x1="84.61" y1="310.20" x2="75.22" y2="313.62"/>
+            <line class="" x1="76.67" y1="280.56" x2="66.83" y2="282.30"/>
+            <line class="" x1="74.00" y1="250.00" x2="64.00" y2="250.00"/>
+            <line class="" x1="76.67" y1="219.44" x2="66.83" y2="217.70"/>
+            <line class="" x1="84.61" y1="189.80" x2="75.22" y2="186.38"/>
+            <line class="tick-major" x1="97.58" y1="162.00" x2="86.32" y2="155.50"/>
+            <line class="" x1="115.18" y1="136.87" x2="107.52" y2="130.44"/>
+            <line class="" x1="136.87" y1="115.18" x2="130.44" y2="107.52"/>
+            <line class="" x1="162.00" y1="97.58" x2="157.00" y2="88.92"/>
+            <line class="" x1="189.80" y1="84.61" x2="186.38" y2="75.22"/>
+            <line class="" x1="219.44" y1="76.67" x2="217.70" y2="66.83"/>
+          </g>
+
+          <g class="spin spin-rev">
+            <animateTransform attributeName="transform" type="rotate" from="360 250 250" to="0 250 250" dur="22s" repeatCount="indefinite"/>
+            <circle class="ring-fine" cx="250" cy="250" r="168" fill="none"/>
+            <path class="arc-seg" d="M250 86 A164 164 0 0 1 392 250" fill="none"/>
+            <path class="arc-seg dim" d="M250 414 A164 164 0 0 1 108 250" fill="none"/>
+          </g>
+
+          <circle class="ring-solid" cx="250" cy="250" r="154" fill="none"/>
+          <g class="bolts" filter="url(#softGlow)">
+            <circle class="bolt" cx="250.00" cy="96.00" r="4.2"/>
+            <circle class="bolt" cx="358.89" cy="141.11" r="4.2"/>
+            <circle class="bolt" cx="404.00" cy="250.00" r="4.2"/>
+            <circle class="bolt" cx="358.89" cy="358.89" r="4.2"/>
+            <circle class="bolt" cx="250.00" cy="404.00" r="4.2"/>
+            <circle class="bolt" cx="141.11" cy="358.89" r="4.2"/>
+            <circle class="bolt" cx="96.00" cy="250.00" r="4.2"/>
+            <circle class="bolt" cx="141.11" cy="141.11" r="4.2"/>
+          </g>
+
+          <g class="spin spin-mid">
+            <animateTransform attributeName="transform" type="rotate" from="0 250 250" to="360 250 250" dur="16s" repeatCount="indefinite"/>
+            <circle cx="250" cy="250" r="132" fill="none" stroke="none"/>
+            <path class="coil" d="M250 118 A132 132 0 0 1 363.3 209" fill="none"/>
+            <path class="coil" d="M363.3 291 A132 132 0 0 1 250 382" fill="none"/>
+            <path class="coil" d="M136.7 291 A132 132 0 0 1 136.7 209" fill="none"/>
+          </g>
+
+          <g class="vanes" filter="url(#softGlow)">
+            <path d="M250 168 L278 230 L250 218 L222 230 Z"/>
+            <path d="M322 292 L248 292 L262 268 L304 248 Z"/>
+            <path d="M178 292 L196 248 L238 268 L252 292 Z"/>
+          </g>
+
+          <circle class="ring-core-trim" cx="250" cy="250" r="58" fill="none"/>
+          <circle class="ring-core-trim thin" cx="250" cy="250" r="48" fill="none"/>
+          <circle class="core-glow" cx="250" cy="250" r="40" filter="url(#hotGlow)" fill="url(#coreGrad)"/>
+          <circle class="core-hot" cx="250" cy="250" r="16" fill="#f7ffff"/>
+        </svg>
+
+        <div class="eq" id="eq" hidden>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span>
+        </div>
+      </div>
+
+      <p class="state-label" id="stateLabel">SYSTEMS ONLINE</p>
+      <p class="awaiting-pill" id="awaitingItJuht" hidden data-i18n="awaitingItJuht">Awaiting It Juht</p>
+      <p class="transcript" id="transcript">Awaiting input, sir.</p>
+    </section>
+
+    <aside class="panel status-panel" id="sysPanel">
+      <div class="panel-chrome">
+        <span class="panel-title" data-i18n="systems">Systems</span>
+        <span class="panel-tag">HUD</span>
+        <button type="button" class="icon-btn mobile-only drawer-close" id="btnCloseSys" data-i18n-aria="closeSys" aria-label="Close systems">×</button>
+      </div>
+      <dl class="stats" id="stats">
+        <div><dt data-i18n="dtState">State</dt><dd id="statState">Idle</dd></div>
+        <div><dt data-i18n="dtBackend">Backend</dt><dd id="statBackend">Ollama</dd></div>
+        <div><dt data-i18n="dtModel">Model</dt><dd id="statModel">llama3.2:3b</dd></div>
+        <div><dt data-i18n="dtVoice">Voice</dt><dd id="statVoice">Default</dd></div>
+        <div><dt data-i18n="dtMic">Microphone</dt><dd id="statMic">Checking…</dd></div>
+        <div><dt data-i18n="dtRecognition">Recognition</dt><dd id="statRecognition">Auto</dd></div>
+        <div><dt data-i18n="dtWake">Wake word</dt><dd id="statWake">Off</dd></div>
+      </dl>
+      <p class="hint-block" id="compatNote"></p>
+    </aside>
+  </main>
+
+  <footer class="dock">
+    <form id="chatForm" class="composer" autocomplete="off">
+      <input id="textInput" type="text" enterkeyhint="send" maxlength="2000" autocomplete="off" autocorrect="off"
+             placeholder="Address J.A.R.V.I.S, or tap the mic…"
+             data-i18n-placeholder="placeholderType" data-i18n-aria="messageAria"
+             aria-label="Message for Jarvis">
+      <button type="button" class="send-btn task-btn" id="btnTask" data-i18n="task" data-i18n-aria="taskAria" data-i18n-title="taskTitle" aria-label="Send task to It Juht" title="Send this as a task to It Juht">Task</button>
+      <button type="submit" class="send-btn" id="btnSend" data-i18n="send" data-i18n-aria="send" aria-label="Send">Send</button>
+    </form>
+    <button type="button" class="mic-btn" id="btnMic" data-i18n-aria="micAria" data-i18n-title="micTitle" aria-label="Start listening" aria-pressed="false" title="Tap to talk, or hold Space on a computer">
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+        <path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h2v-3.07A7 7 0 0 0 19 11h-2z"/>
+      </svg>
+    </button>
+    <p class="dock-hint" id="dockHint"><kbd>Space</kbd> push to talk · type a message anytime</p>
+  </footer>
+
+  <div class="modal" id="settingsModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="panel-chrome">
+        <h2 id="settingsTitle" class="panel-title" data-i18n="settings">Settings</h2>
+        <button type="button" class="icon-btn" id="btnCloseSettings" data-i18n-aria="closeSettings" aria-label="Close settings">×</button>
+      </div>
+      <form id="settingsForm" autocomplete="off">
+        <fieldset>
+          <legend data-i18n="langLegend">Language</legend>
+          <label class="choice">
+            <input type="radio" name="uiLang" value="et" checked>
+            <span><strong>Eesti</strong></span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="uiLang" value="en">
+            <span><strong>English</strong></span>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend data-i18n="brainLegend">Brain</legend>
+          <label class="choice">
+            <input type="radio" name="backend" value="gemini">
+            <span data-i18n-html="brainGemini"><strong>Google Gemini</strong> — free tier, works in the browser and on iPhone. Used automatically once you add a key.</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="backend" value="ollama" checked>
+            <span data-i18n-html="brainOllama"><strong>Ollama</strong> — free, runs on this Mac.</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="backend" value="xai">
+            <span data-i18n-html="brainXai"><strong>xAI Grok</strong> — uses your prepaid xAI API credits.</span>
+          </label>
+        </fieldset>
+
+        <div id="ollamaFields" class="field-group">
+          <label><span data-i18n="ollamaUrl">Ollama URL</span>
+            <input type="url" id="cfgOllamaUrl" value="http://localhost:11434" spellcheck="false">
+          </label>
+          <label><span data-i18n="ollamaModel">Ollama model</span>
+            <input type="text" id="cfgOllamaModel" value="llama3.2:3b" spellcheck="false">
+          </label>
+        </div>
+
+        <div id="xaiFields" class="field-group" hidden>
+          <label><span data-i18n="xaiModel">xAI model</span>
+            <input type="text" id="cfgXaiModel" value="grok-4.7" spellcheck="false">
+          </label>
+          <label><span data-i18n="xaiKey">xAI API key</span>
+            <input type="password" id="cfgXaiKey" placeholder="xai-…" autocomplete="off" spellcheck="false">
+          </label>
+          <p class="fine-print" data-i18n="xaiKeyFine">The key is stored only in this browser’s localStorage. It never leaves your computer except when talking to api.x.ai. Do not paste it into a chat.</p>
+        </div>
+
+        <div id="geminiFields" class="field-group" hidden>
+          <label><span data-i18n="geminiModel">Gemini model</span>
+            <input type="text" id="cfgGeminiModel" value="gemini-3.8-flash" spellcheck="false">
+          </label>
+          <label><span data-i18n="geminiKey">Gemini API key</span>
+            <input type="password" id="cfgGeminiKey" placeholder="AIza…" autocomplete="off" spellcheck="false">
+          </label>
+          <p class="fine-print" data-i18n-html="geminiKeyFine">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>. It is stored only in this device’s localStorage and is sent only to Google when you talk to Jarvis. Never put the key into a public GitHub repository or this chat.</p>
+        </div>
+
+        <fieldset>
+          <legend data-i18n="bridgeLegend">It Juht (actions)</legend>
+          <label><span data-i18n="webhookUrl">Webhook URL</span>
+            <input type="url" id="cfgBridgeUrl" placeholder="https://…" spellcheck="false" autocomplete="off">
+          </label>
+          <label><span data-i18n="authHeader">Authorization header</span>
+            <input type="password" id="cfgBridgeAuth" placeholder="Bearer …" autocomplete="off" spellcheck="false">
+          </label>
+          <label class="choice">
+            <input type="checkbox" id="cfgBridgeAuto" checked>
+            <span data-i18n-html="bridgeAuto"><strong>Send action requests automatically</strong> — email, calendar, weather, web lookup, and similar tasks go to It Juht when the webhook is set.</span>
+          </label>
+          <label><span data-i18n="replyChannel">Reply channel</span>
+            <input type="text" id="cfgReplyTopic" readonly spellcheck="false" autocomplete="off">
+          </label>
+          <div class="settings-actions reply-channel-actions">
+            <a class="ghost-btn" id="btnNtfyNotify" href="ntfy://ntfy.sh/" role="button" data-i18n="ntfyNotify">Get notifications on this phone (ntfy app)</a>
+            <button type="button" class="ghost-btn" id="btnCopyReplyChannel" data-i18n="copyChannel">Copy channel</button>
+            <button type="button" class="ghost-btn" id="btnNewReplyChannel" data-i18n="newChannel">New reply channel</button>
+          </div>
+          <p class="fine-print" data-i18n="ntfyFine">Install the free ntfy app first. If the app doesn't open, open ntfy, tap +, and paste the copied channel name (server ntfy.sh).</p>
+          <p class="fine-print" data-i18n="bridgeFine">The URL, authorization header, and reply channel are stored only on this device. It Juht sends answers to this private channel. Regenerating it disconnects the old one. Never share them in a chat.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend data-i18n="voiceLegend">Voice and hearing</legend>
+          <label><span data-i18n="spokenVoice">Spoken voice</span>
+            <select id="cfgVoice"></select>
+          </label>
+          <label><span data-i18n="voiceEngine">Voice engine</span>
+            <select id="cfgVoiceEngine">
+              <option value="auto" data-i18n="voiceEngineAuto">Automatic</option>
+              <option value="device" data-i18n="voiceEngineDevice">Device voice</option>
+              <option value="gemini" data-i18n="voiceEngineGemini">Gemini voice</option>
+            </select>
+          </label>
+          <label><span data-i18n="jarvisVoice">Jarvise hääl</span>
+            <select id="cfgGeminiVoice">
+              <option value="Charon" data-i18n="voiceCharon">Charon — asjalik ja rahulik</option>
+              <option value="Algieba" data-i18n="voiceAlgieba">Algieba — sile ja rafineeritud</option>
+              <option value="Iapetus" data-i18n="voiceIapetus">Iapetus — selge ja ühtlane</option>
+              <option value="Orus" data-i18n="voiceOrus">Orus — kindel ja viisakas</option>
+            </select>
+          </label>
+          <label><span data-i18n="recognition">Recognition</span>
+            <select id="cfgRecognition">
+              <option value="auto" data-i18n="recAuto">Automatic (Gemini audio on iPhone, browser speech elsewhere)</option>
+              <option value="gemini" data-i18n="recGemini">Gemini audio — works on iPhone</option>
+              <option value="browser" data-i18n="recBrowser">Browser speech (Chrome on a computer)</option>
+            </select>
+          </label>
+          <label class="choice">
+            <input type="checkbox" id="cfgWake">
+            <span data-i18n-html="wakeWord"><strong>Wake word</strong> — continuously listen for “Jarvis”, then the command. Needs browser speech recognition, which is unreliable on iPhone.</span>
+          </label>
+        </fieldset>
+
+        <div class="settings-actions">
+          <button type="button" class="ghost-btn" id="btnTestVoice" data-i18n="testVoice">Test voice</button>
+          <button type="button" class="ghost-btn" id="btnClearLog" data-i18n="clearLog">Clear log</button>
+          <button type="submit" class="send-btn" data-i18n="save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./app.js?v=7"></script>
+</body>
+</html>
